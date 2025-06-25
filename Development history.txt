@@ -1,0 +1,140 @@
+2024.05.08
+--------------------------------
+IP HDL Hierarchy determined
+--------------------------------
+Individual data processing modules for individual wear-out sensors:
+ROSC <-> Ring Oscillator Sensor (Frequency)
+SILC <-> SILC Slope Sensor (Slope)
+EM <-> Electromigration Sensor (Binary)
+Analog <-> Temperature, voltage, generic analog sensor (12-bit ADC)
+
+Communication protocol with MCU: AMBA APB:
+AMBA_read module; AMBA_write module
+
+IP-level solution (FSM):
+1. CPU send command as an AMBA APB data packet (32 bits)
+2. Sensor reads and parses data
+3. Sensor sends measurement result w/ any error message as an AMBA APB data packet (32 bits)
+4. CPU receives measurement data
+
+
+2024.05.27
+--------------------------------
+ROSC basic functionality achieved
+--------------------------------
+Counter module implemented with full functionality
+Top level control implemented using Pseudo code
+Waveform shows correct result
+Not synthesizable
+
+
+2024.05.28
+--------------------------------
+ROSC additional features
+--------------------------------
+Numclkcycles: allowing sampling across multiple clock cycles
+Value Ready Signal (ROSCValReady): Transaction completion flag for CPU for better flow control
+Slow mode & Fast mode: enable switching between 2 modes
+
+
+2024.06.11
+-------------------------------
+ROSC module synthesizable
+-------------------------------
+Replaced module-level control with standard FSM structure
+Added in error code to better track state of operation
+Confirmed fully synthesizable in Quartus
+
+
+2024.06.12
+-------------------------------
+ROSC Minor fix
+-------------------------------
+Replaced synchronous assignment with asynchronized to avoid implied latch & related timequest issues during simulation
+
+
+2024.06.16
+-------------------------------
+SILC module implemented with full functionality and synthesizable
+-------------------------------
+Counter logic implemented and controlled with a module-level FSM
+Timeout state included to account for sensor inactivity
+Design synthesizable in Quartus
+
+
+2024.06.17
+-------------------------------
+SILC improvement
+-------------------------------
+More explicit state name used
+Remove variable reset during initialization & move into FSM control in IDLE state to better mimic hardware behaviour
+
+
+2024.07.08
+------------------------------
+ROSC & SILC cleanup for IP level access
+------------------------------
+Rename ROSC & SILC submodules with different names to avoid conflict during upper level reference
+Normalize error code to 3 bits
+
+
+2024.07.09
+------------------------------
+Sensor processing module further cleanup
+------------------------------
+Exception of Mode = 2'b11 made invalid and module would remain in Idle state
+Before change: 2'b11 would make module enter Slow mode
+
+
+2024.07.10
+------------------------------
+AMBA APB & IP Level HDL functional
+------------------------------
+AMBA APB Read & Write constructed per AMBA APB specifications
+IP-level control and acquisition constructed using AMBA as a communication protocol, with ROSC and SILC modules
+Full measurement cycle completed with preliminary testbench (32-bit command in, 32-bit result out)
+Design is synthesizable using Quartus
+
+
+2024.07.16
+------------------------------
+SILC Parameter restructure
+------------------------------
+This is changed to ensure all parameters fit in a 32-bit CPU command data packet
+Numdescendingslopes: 8 bits -> 6 bits
+Timeoutthreshold: 16 bits -> 12 bits
+
+
+2024.07.22
+-----------------------------
+AMBA_read correction
+-----------------------------
+Ln 34: data length corrected as 32-bit to match input data size
+
+
+2024.08.01
+----------------------------
+README file added to GITHUB Repo
+----------------------------
+The README File includes the following:
+Set up and How to use
+Hierarchy of the HDL design
+Design rules followed
+Cases tested with system Verilog testbench
+Compilation flow
+Open items
+
+
+
+2024.08.03
+----------------------------
+PPA Improvement
+----------------------------
+2 Sets of AMBA Read/Write for measurement cycle control reduced to 1 set. Bidirectional communication achieved through 1 AMBA module
+50% AMBA related IP-level register reduced due to above optimization.
+
+
+
+
+ 
+
