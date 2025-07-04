@@ -1,0 +1,255 @@
+# Reading pref.tcl
+vlib work
+vlog -reportprogress 300 -work work {/home/raul/Documents/UBC/Co-op work/2025 Co-op/Research - Prof Andre Ivanov 2025/VERILOG/ltr-sensor-fusion-soc-peripheral/rtl/AMBA_read.sv}
+# Model Technology ModelSim - Intel FPGA Edition vlog 10.5b Compiler 2016.10 Oct  5 2016
+# Start time: 18:26:52 on Jul 03,2025
+# vlog -reportprogress 300 -work work /home/raul/Documents/UBC/Co-op work/2025 Co-op/Research - Prof Andre Ivanov 2025/VERILOG/ltr-sensor-fusion-soc-peripheral/rtl/AMBA_read.sv 
+# -- Compiling module AMBA_read
+# 
+# Top level modules:
+# 	AMBA_read
+# End time: 18:26:52 on Jul 03,2025, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+vlog -reportprogress 300 -work work {/home/raul/Documents/UBC/Co-op work/2025 Co-op/Research - Prof Andre Ivanov 2025/VERILOG/ltr-sensor-fusion-soc-peripheral/rtl/AMBA_write.sv}
+# Model Technology ModelSim - Intel FPGA Edition vlog 10.5b Compiler 2016.10 Oct  5 2016
+# Start time: 18:26:52 on Jul 03,2025
+# vlog -reportprogress 300 -work work /home/raul/Documents/UBC/Co-op work/2025 Co-op/Research - Prof Andre Ivanov 2025/VERILOG/ltr-sensor-fusion-soc-peripheral/rtl/AMBA_write.sv 
+# -- Compiling module AMBA_write
+# 
+# Top level modules:
+# 	AMBA_write
+# End time: 18:26:52 on Jul 03,2025, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+vlog -reportprogress 300 -work work {/home/raul/Documents/UBC/Co-op work/2025 Co-op/Research - Prof Andre Ivanov 2025/VERILOG/ltr-sensor-fusion-soc-peripheral/rtl/AnalogSensor.sv}
+# Model Technology ModelSim - Intel FPGA Edition vlog 10.5b Compiler 2016.10 Oct  5 2016
+# Start time: 18:26:52 on Jul 03,2025
+# vlog -reportprogress 300 -work work /home/raul/Documents/UBC/Co-op work/2025 Co-op/Research - Prof Andre Ivanov 2025/VERILOG/ltr-sensor-fusion-soc-peripheral/rtl/AnalogSensor.sv 
+# -- Compiling module AnalogSensor
+# -- Compiling module AnalogGetDataFSM
+# -- Compiling module AcquireAnalogData
+# 
+# Top level modules:
+# 	AnalogSensor
+# End time: 18:26:52 on Jul 03,2025, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+vlog -reportprogress 300 -work work {/home/raul/Documents/UBC/Co-op work/2025 Co-op/Research - Prof Andre Ivanov 2025/VERILOG/ltr-sensor-fusion-soc-peripheral/rtl/DataAcquisitionIP.sv}
+# Model Technology ModelSim - Intel FPGA Edition vlog 10.5b Compiler 2016.10 Oct  5 2016
+# Start time: 18:26:52 on Jul 03,2025
+# vlog -reportprogress 300 -work work /home/raul/Documents/UBC/Co-op work/2025 Co-op/Research - Prof Andre Ivanov 2025/VERILOG/ltr-sensor-fusion-soc-peripheral/rtl/DataAcquisitionIP.sv 
+# -- Compiling module DataAcquisitionIP
+# 
+# Top level modules:
+# 	DataAcquisitionIP
+# End time: 18:26:52 on Jul 03,2025, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+vlog -reportprogress 30 -work work {/home/raul/Documents/UBC/Co-op work/2025 Co-op/Research - Prof Andre Ivanov 2025/VERILOG/ltr-sensor-fusion-soc-peripheral/rtl/EM.sv}
+# Model Technology ModelSim - Intel FPGA Edition vlog 10.5b Compiler 2016.10 Oct  5 2016
+# Start time: 18:26:52 on Jul 03,2025
+# vlog -reportprogress 30 -work work /home/raul/Documents/UBC/Co-op work/2025 Co-op/Research - Prof Andre Ivanov 2025/VERILOG/ltr-sensor-fusion-soc-peripheral/rtl/EM.sv 
+# -- Compiling module EM
+# -- Compiling module GetEMReadingFSM
+# -- Compiling module AcquireEMData
+# 
+# Top level modules:
+# 	EM
+# End time: 18:26:52 on Jul 03,2025, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+vlog -reportprogress 30 -work work {/home/raul/Documents/UBC/Co-op work/2025 Co-op/Research - Prof Andre Ivanov 2025/VERILOG/ltr-sensor-fusion-soc-peripheral/rtl/ROSC.sv}
+# Model Technology ModelSim - Intel FPGA Edition vlog 10.5b Compiler 2016.10 Oct  5 2016
+# Start time: 18:26:52 on Jul 03,2025
+# vlog -reportprogress 30 -work work /home/raul/Documents/UBC/Co-op work/2025 Co-op/Research - Prof Andre Ivanov 2025/VERILOG/ltr-sensor-fusion-soc-peripheral/rtl/ROSC.sv 
+# -- Compiling module ROSC
+# -- Compiling module ROSCgetdataFSM
+# -- Compiling module counter
+# 
+# Top level modules:
+# 	ROSC
+# End time: 18:26:52 on Jul 03,2025, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+vlog -reportprogress 30 -work work {/home/raul/Documents/UBC/Co-op work/2025 Co-op/Research - Prof Andre Ivanov 2025/VERILOG/ltr-sensor-fusion-soc-peripheral/rtl/SILC.sv}
+# Model Technology ModelSim - Intel FPGA Edition vlog 10.5b Compiler 2016.10 Oct  5 2016
+# Start time: 18:26:52 on Jul 03,2025
+# vlog -reportprogress 30 -work work /home/raul/Documents/UBC/Co-op work/2025 Co-op/Research - Prof Andre Ivanov 2025/VERILOG/ltr-sensor-fusion-soc-peripheral/rtl/SILC.sv 
+# -- Compiling module SILC
+# -- Compiling module SILCgetdataFSM
+# -- Compiling module GetSlopeFSM
+# -- Compiling module SlopeCounter
+# 
+# Top level modules:
+# 	SILC
+# End time: 18:26:52 on Jul 03,2025, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+vlog -reportprogress 300 -work work {/home/raul/Documents/UBC/Co-op work/2025 Co-op/Research - Prof Andre Ivanov 2025/VERILOG/ltr-sensor-fusion-soc-peripheral/tb/smoke/AMBA_read_tb.sv}
+# Model Technology ModelSim - Intel FPGA Edition vlog 10.5b Compiler 2016.10 Oct  5 2016
+# Start time: 18:27:38 on Jul 03,2025
+# vlog -reportprogress 300 -work work /home/raul/Documents/UBC/Co-op work/2025 Co-op/Research - Prof Andre Ivanov 2025/VERILOG/ltr-sensor-fusion-soc-peripheral/tb/smoke/AMBA_read_tb.sv 
+# -- Compiling module AMBA_read_tb
+# 
+# Top level modules:
+# 	AMBA_read_tb
+# End time: 18:27:38 on Jul 03,2025, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+vlog -reportprogress 300 -work work {/home/raul/Documents/UBC/Co-op work/2025 Co-op/Research - Prof Andre Ivanov 2025/VERILOG/ltr-sensor-fusion-soc-peripheral/tb/smoke/AMBA_write_tb.sv}
+# Model Technology ModelSim - Intel FPGA Edition vlog 10.5b Compiler 2016.10 Oct  5 2016
+# Start time: 18:27:38 on Jul 03,2025
+# vlog -reportprogress 300 -work work /home/raul/Documents/UBC/Co-op work/2025 Co-op/Research - Prof Andre Ivanov 2025/VERILOG/ltr-sensor-fusion-soc-peripheral/tb/smoke/AMBA_write_tb.sv 
+# -- Compiling module AMBA_write_tb
+# 
+# Top level modules:
+# 	AMBA_write_tb
+# End time: 18:27:38 on Jul 03,2025, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+vlog -reportprogress 300 -work work {/home/raul/Documents/UBC/Co-op work/2025 Co-op/Research - Prof Andre Ivanov 2025/VERILOG/ltr-sensor-fusion-soc-peripheral/tb/smoke/AnalogSensor_tb.sv}
+# Model Technology ModelSim - Intel FPGA Edition vlog 10.5b Compiler 2016.10 Oct  5 2016
+# Start time: 18:27:38 on Jul 03,2025
+# vlog -reportprogress 300 -work work /home/raul/Documents/UBC/Co-op work/2025 Co-op/Research - Prof Andre Ivanov 2025/VERILOG/ltr-sensor-fusion-soc-peripheral/tb/smoke/AnalogSensor_tb.sv 
+# -- Compiling module AnalogSensor_tb
+# 
+# Top level modules:
+# 	AnalogSensor_tb
+# End time: 18:27:38 on Jul 03,2025, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+vlog -reportprogress 300 -work work {/home/raul/Documents/UBC/Co-op work/2025 Co-op/Research - Prof Andre Ivanov 2025/VERILOG/ltr-sensor-fusion-soc-peripheral/tb/smoke/DataAcquisitionIP_tb.sv}
+# Model Technology ModelSim - Intel FPGA Edition vlog 10.5b Compiler 2016.10 Oct  5 2016
+# Start time: 18:27:38 on Jul 03,2025
+# vlog -reportprogress 300 -work work /home/raul/Documents/UBC/Co-op work/2025 Co-op/Research - Prof Andre Ivanov 2025/VERILOG/ltr-sensor-fusion-soc-peripheral/tb/smoke/DataAcquisitionIP_tb.sv 
+# -- Compiling module DataAcquisitionIP_tb
+# 
+# Top level modules:
+# 	DataAcquisitionIP_tb
+# End time: 18:27:38 on Jul 03,2025, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+vlog -reportprogress 300 -work work {/home/raul/Documents/UBC/Co-op work/2025 Co-op/Research - Prof Andre Ivanov 2025/VERILOG/ltr-sensor-fusion-soc-peripheral/tb/smoke/EM_tb.sv}
+# Model Technology ModelSim - Intel FPGA Edition vlog 10.5b Compiler 2016.10 Oct  5 2016
+# Start time: 18:27:38 on Jul 03,2025
+# vlog -reportprogress 300 -work work /home/raul/Documents/UBC/Co-op work/2025 Co-op/Research - Prof Andre Ivanov 2025/VERILOG/ltr-sensor-fusion-soc-peripheral/tb/smoke/EM_tb.sv 
+# -- Compiling module EM_tb
+# 
+# Top level modules:
+# 	EM_tb
+# End time: 18:27:38 on Jul 03,2025, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+vlog -reportprogress 300 -work work {/home/raul/Documents/UBC/Co-op work/2025 Co-op/Research - Prof Andre Ivanov 2025/VERILOG/ltr-sensor-fusion-soc-peripheral/tb/smoke/ROSC_tb.sv}
+# Model Technology ModelSim - Intel FPGA Edition vlog 10.5b Compiler 2016.10 Oct  5 2016
+# Start time: 18:27:38 on Jul 03,2025
+# vlog -reportprogress 300 -work work /home/raul/Documents/UBC/Co-op work/2025 Co-op/Research - Prof Andre Ivanov 2025/VERILOG/ltr-sensor-fusion-soc-peripheral/tb/smoke/ROSC_tb.sv 
+# -- Compiling module ROSC_tb
+# 
+# Top level modules:
+# 	ROSC_tb
+# End time: 18:27:38 on Jul 03,2025, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+vlog -reportprogress 300 -work work {/home/raul/Documents/UBC/Co-op work/2025 Co-op/Research - Prof Andre Ivanov 2025/VERILOG/ltr-sensor-fusion-soc-peripheral/tb/smoke/SILC_tb.sv}
+# Model Technology ModelSim - Intel FPGA Edition vlog 10.5b Compiler 2016.10 Oct  5 2016
+# Start time: 18:27:38 on Jul 03,2025
+# vlog -reportprogress 300 -work work /home/raul/Documents/UBC/Co-op work/2025 Co-op/Research - Prof Andre Ivanov 2025/VERILOG/ltr-sensor-fusion-soc-peripheral/tb/smoke/SILC_tb.sv 
+# -- Compiling module SILC_tb
+# 
+# Top level modules:
+# 	SILC_tb
+# End time: 18:27:38 on Jul 03,2025, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+vsim work.DataAcquisitionIP_tb
+# vsim work.DataAcquisitionIP_tb 
+# Start time: 18:27:58 on Jul 03,2025
+# Loading sv_std.std
+# Loading work.DataAcquisitionIP_tb
+# Loading work.DataAcquisitionIP
+# Loading work.AMBA_write
+# Loading work.AMBA_read
+# Loading work.ROSC
+# Loading work.ROSCgetdataFSM
+# Loading work.counter
+# Loading work.AnalogSensor
+# Loading work.AnalogGetDataFSM
+# Loading work.AcquireAnalogData
+# Loading work.EM
+# Loading work.GetEMReadingFSM
+# Loading work.AcquireEMData
+# Loading work.SILC
+# Loading work.SILCgetdataFSM
+# Loading work.GetSlopeFSM
+# Loading work.SlopeCounter
+add wave sim:/DataAcquisitionIP_tb/*
+add wave sim:/DataAcquisitionIP_tb/DUT/ROSC_S1/*
+run -all
+# ** Warning: (vsim-3116) Problem reading symbols from linux-gate.so.1 : can not open ELF file.
+# ** Warning: (vsim-3116) Problem reading symbols from /lib/i386-linux-gnu/libpthread.so.0 : module was loaded at an absolute address.
+# ** Warning: (vsim-3116) Problem reading symbols from /lib/i386-linux-gnu/librt.so.1 : module was loaded at an absolute address.
+# ** Warning: (vsim-3116) Problem reading symbols from /lib/i386-linux-gnu/libdl.so.2 : module was loaded at an absolute address.
+# ** Warning: (vsim-3116) Problem reading symbols from /lib/i386-linux-gnu/libm.so.6 : module was loaded at an absolute address.
+# ** Warning: (vsim-3116) Problem reading symbols from /lib/i386-linux-gnu/libc.so.6 : module was loaded at an absolute address.
+# ** Warning: (vsim-3116) Problem reading symbols from /lib/ld-linux.so.2 : module was loaded at an absolute address.
+quit -sim
+# End time: 18:37:41 on Jul 03,2025, Elapsed time: 0:09:43
+# Errors: 0, Warnings: 7
+vsim work.DataAcquisitionIP_tb
+# vsim work.DataAcquisitionIP_tb 
+# Start time: 18:38:33 on Jul 03,2025
+# Loading sv_std.std
+# Loading work.DataAcquisitionIP_tb
+# Loading work.DataAcquisitionIP
+# Loading work.AMBA_write
+# Loading work.AMBA_read
+# Loading work.ROSC
+# Loading work.ROSCgetdataFSM
+# Loading work.counter
+# Loading work.AnalogSensor
+# Loading work.AnalogGetDataFSM
+# Loading work.AcquireAnalogData
+# Loading work.EM
+# Loading work.GetEMReadingFSM
+# Loading work.AcquireEMData
+# Loading work.SILC
+# Loading work.SILCgetdataFSM
+# Loading work.GetSlopeFSM
+# Loading work.SlopeCounter
+-voptargs="+acc"
+# invalid command name "-voptargs="+acc""
+
+quit -sim
+# End time: 18:40:05 on Jul 03,2025, Elapsed time: 0:01:32
+# Errors: 1, Warnings: 0
+vsim -voptargs="+acc" work.DataAcquisitionIP_tb
+# vsim -voptargs=""+acc"" work.DataAcquisitionIP_tb 
+# Start time: 18:40:26 on Jul 03,2025
+# Loading sv_std.std
+# Loading work.DataAcquisitionIP_tb
+# Loading work.DataAcquisitionIP
+# Loading work.AMBA_write
+# Loading work.AMBA_read
+# Loading work.ROSC
+# Loading work.ROSCgetdataFSM
+# Loading work.counter
+# Loading work.AnalogSensor
+# Loading work.AnalogGetDataFSM
+# Loading work.AcquireAnalogData
+# Loading work.EM
+# Loading work.GetEMReadingFSM
+# Loading work.AcquireEMData
+# Loading work.SILC
+# Loading work.SILCgetdataFSM
+# Loading work.GetSlopeFSM
+# Loading work.SlopeCounter
+add wave sim:/DataAcquisitionIP_tb/*
+add wave sim:/DataAcquisitionIP_tb/DUT/ROSC_S1/*
+add wave sim:/DataAcquisitionIP_tb/DUT/ROSC_S1/freqcounter/*
+run -all
+# ** Warning: (vsim-3116) Problem reading symbols from linux-gate.so.1 : can not open ELF file.
+# ** Warning: (vsim-3116) Problem reading symbols from /lib/i386-linux-gnu/libpthread.so.0 : module was loaded at an absolute address.
+# ** Warning: (vsim-3116) Problem reading symbols from /lib/i386-linux-gnu/librt.so.1 : module was loaded at an absolute address.
+# ** Warning: (vsim-3116) Problem reading symbols from /lib/i386-linux-gnu/libdl.so.2 : module was loaded at an absolute address.
+# ** Warning: (vsim-3116) Problem reading symbols from /lib/i386-linux-gnu/libm.so.6 : module was loaded at an absolute address.
+# ** Warning: (vsim-3116) Problem reading symbols from /lib/i386-linux-gnu/libc.so.6 : module was loaded at an absolute address.
+# ** Warning: (vsim-3116) Problem reading symbols from /lib/ld-linux.so.2 : module was loaded at an absolute address.
+restart -f
+restart -f
+run -all
+# ** Warning: (vsim-3116) Problem reading symbols from linux-gate.so.1 : can not open ELF file.
+# ** Warning: (vsim-3116) Problem reading symbols from /lib/i386-linux-gnu/libpthread.so.0 : module was loaded at an absolute address.
+# ** Warning: (vsim-3116) Problem reading symbols from /lib/i386-linux-gnu/librt.so.1 : module was loaded at an absolute address.
+# ** Warning: (vsim-3116) Problem reading symbols from /lib/i386-linux-gnu/libdl.so.2 : module was loaded at an absolute address.
+# ** Warning: (vsim-3116) Problem reading symbols from /lib/i386-linux-gnu/libm.so.6 : module was loaded at an absolute address.
+# ** Warning: (vsim-3116) Problem reading symbols from /lib/i386-linux-gnu/libc.so.6 : module was loaded at an absolute address.
+# ** Warning: (vsim-3116) Problem reading symbols from /lib/ld-linux.so.2 : module was loaded at an absolute address.
+add wave sim:/DataAcquisitionIP_tb/*

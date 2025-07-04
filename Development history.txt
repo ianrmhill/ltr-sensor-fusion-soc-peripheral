@@ -136,5 +136,34 @@ PPA Improvement
 
 
 
+------------------------------------------------Project Part 2-------------------------------------------
+Ian and Raul
+
+
+
+2025.06.24
+-------------------------------
+Overall Architecture Improvement
+--------------------------------
+List of problems identified:
+    - Problem #2: There is a mix of Read&Write bits in the CPUCommand register. That is, the LSB (CPUCommand[0] is the CPU Reading Complete).
+    - Problem #3 [new Requirements by Ian (new features)]: Since we want to have the option of sending the relative drift of sensor output to the CPU instead of just sending out the raw sensor data, we want to be able to.
+        A) Have 2 REF values per sensor.
+            1. REF_VAL1; the reference sensor value since the beginning of time
+            2. REF_VAL2; the reference sensor value since power up
+
+        I would imagine that the CPU would have to have some sort of routine to populate these reference values.
+        I’m unsure if best practice would be to have the IP architecture itself with a dedicated routine to populate “last power-up” values say, if I can totally see that CPU could do this as well.
+        I guess there is value and novelty on having the IP block doing this by itself...
+
+        B) CPUCommand should instruct whether to:
+            1. Provide a result that contains CURRENT VALUE minus REF1
+            2. Provide a result that contains CURRENT VALUE minus REF2
+            3. Provide a result that contains CURRENT VALUE 
+    - Problem #4: There is not intermediate “status” bit on measurement. Only after the sensor has finished its tests, the RESULT register would contain whether or not there was an error in the measurement.
+
+
+
+
  
 

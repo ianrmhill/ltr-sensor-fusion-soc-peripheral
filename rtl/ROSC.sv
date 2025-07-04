@@ -159,7 +159,7 @@ always_comb
         Fast: begin
             startmeas = 0;
             ROSCValue = 0;
-            ErrorCode = 2;
+            ErrorCode = 2;    //check later if this is correct; on datasheet for ROSC, error code is 3'b100
             ROSCValReady = 0;
         end
 
