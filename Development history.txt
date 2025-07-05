@@ -145,7 +145,7 @@ Ian and Raul
 -------------------------------
 Overall Architecture Improvement
 --------------------------------
-List of problems identified:
+/***** List of problems identified ******/
     - Problem #2: There is a mix of Read&Write bits in the CPUCommand register. That is, the LSB (CPUCommand[0] is the CPU Reading Complete).
     - Problem #3 [new Requirements by Ian (new features)]: Since we want to have the option of sending the relative drift of sensor output to the CPU instead of just sending out the raw sensor data, we want to be able to.
         A) Have 2 REF values per sensor.
@@ -161,8 +161,43 @@ List of problems identified:
             2. Provide a result that contains CURRENT VALUE minus REF2
             3. Provide a result that contains CURRENT VALUE 
     - Problem #4: There is not intermediate “status” bit on measurement. Only after the sensor has finished its tests, the RESULT register would contain whether or not there was an error in the measurement.
+    - Problem #5: [New consideration by Ian on June 26th]: Make registers capable of not only handling 32 bit instructions
+        but 8 and 16 bits as well. APB Bus has dynamic bit width capabilities so implementing this should be fine.
 
+/******* Project Milestones ********/
+    1. Milestone 1: Address Problem #4 and Problem #5
+        - Add a 32-bit read only STATUS register at new APB address [busy, ERR, Done]
+        - Make registers capable of not only handling 32 bit instructions but 8 and 16 bits as well. APB Bus has dynamic bit
+            width capabilities so implementing this is doable.
 
+        In order to accomplish Milestone 1, I have to redefine the backbone of DataAcquisitionIP.sv because it currently intantiates AMBA_write.sv and
+        AMBA_read.sv as two internal masters with each pointing at a single 32 bit reg (the command reg and the result reg).
+        This is a problem if we want to scale this system because currenty the DataAcquisitionIP FSM walks through steps
+        CW-->SR-->GETDATA-->SW-->CR and at each step it toggles pwrite and penable, and one of the two existing 32-bit register. 
+        In other words, the only two regs that the FSM interacts with are hard coded. 
+        
+        Therefore, in order to integrate a new read-only reg for the status bits, we need a true APB-slave integration in such a way that:
+            1. Decodes the incoming PADDR[7:0] into three register slots:
+                0x00 → CPUCommand (write)
+                0x01 → ResultForCPU (read)
+                0x[actual address to be decided later] → StatusBits (read)
+
+            2. Routes the incoming PWDATA/PWRITE to the right internal register on a write to 0x00
+
+            3. Drives the external PRDATA from the right internal signal on a read via a mux
+
+    2. Milestone 2: Address Problem #3 [Part 1]
+        - Add storage per sensor. Two REF values per sensor
+            REF_VAL1; the reference sensor value since the beginning of time
+            REF_VAL2; the reference sensor value since power up
+        - Automatic REF2 capture at power-up. Define FSM substrate for this
+        - Dedicated routine to capture REF1 as well
+        
+    3. Milestone 3: Address Problem #3 [Part 2]
+        - New control bits. Modify CPUCommand so that we can instruct de IP block whether to:
+            - Provide a result that contains CURRENT VALUE minus REF1
+            - Provide a result that contains CURRENT VALUE minus REF2
+            - Provide a result that only contains CURRENT VALUE
 
 
  

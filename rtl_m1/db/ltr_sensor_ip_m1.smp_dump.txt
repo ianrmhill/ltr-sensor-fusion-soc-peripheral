@@ -1,0 +1,63 @@
+
+State Machine - |DataAcquisitionIP_core|state
+Name state.IDLE state.COMPLETE state.BUSY 
+state.IDLE 0 0 0 
+state.BUSY 1 0 1 
+state.COMPLETE 1 1 0 
+
+State Machine - |DataAcquisitionIP_core|AnalogSensor:Voltage_S1|AnalogGetDataFSM:AnalogGetData|state
+Name state.Slow state.Fast state.DataReady state.Reset 
+state.Reset 0 0 0 0 
+state.DataReady 0 0 1 1 
+state.Fast 0 1 0 1 
+state.Slow 1 0 0 1 
+
+State Machine - |DataAcquisitionIP_core|AnalogSensor:Temperature_S1|AnalogGetDataFSM:AnalogGetData|state
+Name state.Slow state.Fast state.DataReady state.Reset 
+state.Reset 0 0 0 0 
+state.DataReady 0 0 1 1 
+state.Fast 0 1 0 1 
+state.Slow 1 0 0 1 
+
+State Machine - |DataAcquisitionIP_core|SILC:SILC_S1|GetSlopeFSM:SILCMeasureSlope|state
+Name state.Timeouterror state.Completion state.Acquisition state.Idle 
+state.Idle 0 0 0 0 
+state.Acquisition 0 0 1 1 
+state.Completion 0 1 0 1 
+state.Timeouterror 1 0 0 1 
+
+State Machine - |DataAcquisitionIP_core|SILC:SILC_S1|SILCgetdataFSM:SILCGetData|state
+Name state.Fast state.Timeout state.DataReady state.Reset state.Slow 
+state.Reset 0 0 0 0 0 
+state.DataReady 0 0 1 1 0 
+state.Timeout 0 1 0 1 0 
+state.Fast 1 0 0 1 0 
+state.Slow 0 0 0 1 1 
+
+State Machine - |DataAcquisitionIP_core|ROSC:TDDBSensor_S1|ROSCgetdataFSM:ROSCGetData|state
+Name state.Slow state.Fast state.DataReady state.Reset 
+state.Reset 0 0 0 0 
+state.DataReady 0 0 1 1 
+state.Fast 0 1 0 1 
+state.Slow 1 0 0 1 
+
+State Machine - |DataAcquisitionIP_core|EM:EMSensor_S1|GetEMReadingFSM:GetEMReading|state
+Name state.Slow state.Fast state.DataReady state.Reset 
+state.Reset 0 0 0 0 
+state.DataReady 0 0 1 1 
+state.Fast 0 1 0 1 
+state.Slow 1 0 0 1 
+
+State Machine - |DataAcquisitionIP_core|AnalogSensor:DCAnalog_S1|AnalogGetDataFSM:AnalogGetData|state
+Name state.Slow state.Fast state.DataReady state.Reset 
+state.Reset 0 0 0 0 
+state.DataReady 0 0 1 1 
+state.Fast 0 1 0 1 
+state.Slow 1 0 0 1 
+
+State Machine - |DataAcquisitionIP_core|ROSC:ROSC_S1|ROSCgetdataFSM:ROSCGetData|state
+Name state.Slow state.Fast state.DataReady state.Reset 
+state.Reset 0 0 0 0 
+state.DataReady 0 0 1 1 
+state.Fast 0 1 0 1 
+state.Slow 1 0 0 1 
