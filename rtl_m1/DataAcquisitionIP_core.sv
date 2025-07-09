@@ -45,7 +45,13 @@ Inputs:
   SensorReadings  – 8 × 16-bit raw sensor inputs
 Outputs:
   ResultForCPU[31:0] – 32-bit measurement result: [31:16]=value, [15:13]=error, [0]=ready
-  StatusBits[2:0]    – {busy, err_sticky, done}
+  StatusBits[2:0]    – {busy, err_sticky, done}  {NEW}
+
+NOTES:
+1. The V1.0 DataAcquisitionIP was refactored into a pure DataAcquisitionIP_core by pulling all AMBA/APB bus logic
+into a separate wrapper leaving the core to focus solely on sensor FSM control and data flow.
+2. We added a 3-bit read-only STATUS register (busy/err_sticky/done) so the CPU can efficiently poll just the
+measurement state instead of reading the full 32 bit result word.
 ************************************************************************************************************/
 
 module DataAcquisitionIP_core(
@@ -96,7 +102,7 @@ module DataAcquisitionIP_core(
   logic [31:0] sensormeasdata;
 
   //–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––
-  // 1) Parse the command fields once per cycle
+  // 1) Parse the command fields
   //–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––
   always_comb begin
     mode               = cpucommandforparsing[31:30];
@@ -112,11 +118,11 @@ module DataAcquisitionIP_core(
   // 2) Break out the raw sensor‐bus into named signals
   //–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––
   always_comb begin
-    ROSCReading      = SensorReadings[1][0];
-    DCAnalogReading  = SensorReadings[2][11:0];
-    EMReading        = SensorReadings[3][7:0];
-    TDDBReading      = SensorReadings[4][0];
-    SILCADCReading   = SensorReadings[5][11:0];
+    ROSCReading        = SensorReadings[1][0];
+    DCAnalogReading    = SensorReadings[2][11:0];   //only taking 12/16 bits from the data in SensorReadings[2][15:0]
+    EMReading          = SensorReadings[3][7:0];
+    TDDBReading        = SensorReadings[4][0];
+    SILCADCReading     = SensorReadings[5][11:0];
     TemperatureReading = SensorReadings[6][11:0];
     VoltageReading     = SensorReadings[7][11:0];
   end
@@ -124,6 +130,11 @@ module DataAcquisitionIP_core(
   //–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––
   // 3) Instantiate each sensor wrapper
   //–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––
+
+        // NOTE FOR LATER: do notice that each wrapper is explicitly asking for ONLY sensoeIndex0; this is how V1.0 of this module
+        //                 had it; so for the sake of simplicity i'll leave it like this for now. in the future i'll have to 
+        //                 instantiate an array instead. 
+
   ROSC ROSC_S1(
     mode,
     (PSELx == 1) && (SensorIndex == 0),
@@ -189,7 +200,7 @@ module DataAcquisitionIP_core(
   typedef enum logic [1:0] { IDLE, BUSY, COMPLETE } state_t;
   state_t state, nextstate;
 
-  // State register with asynchronous disable
+  // State register with asynchronous disable (personally I didn't like going to IDLE if CPUCommand=0 [now, random zero writes won't take us of out "BUSY" state])
   always_ff @(posedge Clk or negedge En) begin
     if (!En)       state <= IDLE;
     else           state <= nextstate;
