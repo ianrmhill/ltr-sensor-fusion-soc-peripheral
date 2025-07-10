@@ -1,0 +1,60 @@
+m255
+K4
+z2
+13
+!s112 1.1
+!i10d 8192
+!i10e 25
+!i10f 100
+cModel Technology
+d/home/raul
+vDataAcquisitionIP_apb
+Z0 DXx6 sv_std 3 std 0 22 AD7iAPLo6nTIKk<N0eo=D3
+Z1 !s110 1752162744
+!i10b 1
+!s100 59J]cF1Sh7_EAIkYoVnkK2
+I=@l4?Be7mU>KSJVLX<YY[3
+Z2 VDg1SIo80bB@j0V0VzS_@n1
+!s105 DataAcquisitionIP_apb_sv_unit
+S1
+Z3 d/home/raul/ltr-sensor-fusion-soc-peripheral/tb_m1/tb_apb_version32bitonly
+w1752161905
+8/home/raul/ltr-sensor-fusion-soc-peripheral/rtl_m1/DataAcquisitionIP_apb.sv
+F/home/raul/ltr-sensor-fusion-soc-peripheral/rtl_m1/DataAcquisitionIP_apb.sv
+L0 7
+Z4 OV;L;10.5b;63
+r1
+!s85 0
+31
+Z5 !s108 1752162744.000000
+!s107 /home/raul/ltr-sensor-fusion-soc-peripheral/rtl_m1/DataAcquisitionIP_apb.sv|
+!s90 -reportprogress|300|-work|work|-sv|-stats=none|/home/raul/ltr-sensor-fusion-soc-peripheral/rtl_m1/DataAcquisitionIP_apb.sv|
+!i113 1
+Z6 o-work work -sv
+Z7 tCvgOpt 0
+n@data@acquisition@i@p_apb
+vDataAcquisitionIP_core
+R0
+R1
+!i10b 1
+!s100 J?gHk4SeiBWAbWLJ_1KkC3
+I8VdKPR<nkAEWGD1K2NATm2
+R2
+!s105 DataAcquisitionIP_core_sv_unit
+S1
+R3
+w1752030937
+8/home/raul/ltr-sensor-fusion-soc-peripheral/rtl_m1/DataAcquisitionIP_core.sv
+F/home/raul/ltr-sensor-fusion-soc-peripheral/rtl_m1/DataAcquisitionIP_core.sv
+L0 57
+R4
+r1
+!s85 0
+31
+R5
+!s107 /home/raul/ltr-sensor-fusion-soc-peripheral/rtl_m1/DataAcquisitionIP_core.sv|
+!s90 -reportprogress|300|-work|work|-sv|-stats=none|/home/raul/ltr-sensor-fusion-soc-peripheral/rtl_m1/DataAcquisitionIP_core.sv|
+!i113 1
+R6
+R7
+n@data@acquisition@i@p_core

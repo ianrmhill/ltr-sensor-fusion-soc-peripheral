@@ -1,8 +1,12 @@
 //add documentation note here {TO DO later}
 
+// CPUCommandsReg at 0x00
+// StatusBits     at 0x04  [offsets defined artbitrarly; can ask Ian if there's a better way]
+// ResultForCPU   at 0x08
+
 module DataAcquisitionIP_apb(
   input  logic            PCLK,       // APB clock
-  input  logic            PRESETn,    // async active low reset
+  input  logic            PRESETn,    // async active low reset or sync reset?
   input  logic            PSEL,       // slave select
   input  logic            PENABLE,    // access phase
   input  logic            PWRITE,     // 1 = write, 0 = read
@@ -23,7 +27,7 @@ module DataAcquisitionIP_apb(
   logic [31:0] coreResult;
   logic  [2:0] coreStatusBits;
 
-  // 3) We instantiate the core (always enabled)
+  // 3) We instantiate the core (always enabled FOR NOW only cuz im testing)
   DataAcquisitionIP_core core (
     .Clk           (PCLK),
     .En            (1'b1),
@@ -44,7 +48,7 @@ module DataAcquisitionIP_apb(
   // 5) APB read path: multiplex PRDATA by PADDR
   always_comb begin
     unique case (PADDR)
-      8'h00: PRDATA = CPUCommandsReg;                                  // read back command
+      8'h00: PRDATA = CPUCommandsReg; // this is rlly optional but apparently is also good practice to be able to read what you sent for debugging
       8'h04: PRDATA = {29'd0, coreStatusBits};                         // {busy, err_sticky, done}
       8'h08: PRDATA = coreResult;                                      // full 32-bit result
       default: PRDATA = 32'd0;                                         // illegal addr --> zero
