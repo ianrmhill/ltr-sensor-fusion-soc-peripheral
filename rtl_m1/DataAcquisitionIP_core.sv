@@ -53,21 +53,36 @@ into a separate wrapper leaving the core to focus solely on sensor FSM control a
 2. We added a 3-bit read-only STATUS register (busy/err_sticky/done) so the CPU can efficiently poll just the
 measurement state instead of reading the full 32 bit result word.
 ************************************************************************************************************/
+//update these notes on V2.0 as rthey are now obsolete because of the new clear status bit and
+//  structure of CPUCommands reg
+
+
+
+
+
+
+/** Register map (APB offsets):
+//   0x00 = CPUCommand      // 32-bit command word  {w'll update it later to dynamic 8 and 32 bit}
+//   0x04 = STATUS          // read-only: {busy, err_sticky, done}
+//   0x08 = RESULT          // read-only: 32-bit measurement result
+//   0x0C = STATUS_CLEAR    // write-1-to-clear both err_sticky and done
+**/
 
 module DataAcquisitionIP_core(
-  input  logic           Clk,
-  input  logic           En,
-  input  logic   [31:0]  CPUCommand,
+  input  logic              Clk,
+  input  logic              En,
+  input  logic   [31:0]     CPUCommand,
+  input  logic              STATUS_CLEAR,
   input  logic  [7:0][15:0] SensorReadings,
-  output logic   [31:0]  ResultForCPU,
-  output logic    [2:0]  StatusBits    // {busy, err_sticky, done}
+  output logic   [31:0]     ResultForCPU,
+  output logic    [2:0]     StatusBits
 );
 
   //–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––
   // Internal status signals
   logic busy;         // high while measurement in progress
-  logic done;         // pulses high for one cycle on completion
-  logic err_sticky;   // latches any non-001 error until cleared
+  logic done;         // pulses high on completion until STATUS_CLEAR
+  logic err_sticky;   // latches any non-001 error until STATUS_CLEAR
   //–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––
 
   // Capture the command word when entering BUSY
@@ -81,8 +96,9 @@ module DataAcquisitionIP_core(
   logic [5:0]  numdescendingslopes;
   logic [11:0] timeoutthreshold;
 
-  // Direct “CPU read complete” bit from the live input
-  logic cpureadinput;
+            //TO BE REMOVEDD
+            // Direct “CPU read complete” bit from the live input
+            //logic cpureadinput;
 
   // Sensor inputs, extracted from SensorReadings
   logic         ROSCReading;
@@ -111,7 +127,8 @@ module DataAcquisitionIP_core(
     numclkcycles       = cpucommandforparsing[23:20];
     numdescendingslopes= cpucommandforparsing[19:14];
     timeoutthreshold   = cpucommandforparsing[13:2];
-    cpureadinput       = CPUCommand[0];
+        //TO BE REMOVEDD
+        //cpureadinput       = CPUCommand[0];
   end
 
   //–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––
@@ -200,7 +217,7 @@ module DataAcquisitionIP_core(
   typedef enum logic [1:0] { IDLE, BUSY, COMPLETE } state_t;
   state_t state, nextstate;
 
-  // State register with asynchronous disable (personally I didn't like going to IDLE if CPUCommand=0 [now, random zero writes won't take us of out "BUSY" state])
+  // State register with asynchronous disable
   always_ff @(posedge Clk or negedge En) begin
     if (!En)       state <= IDLE;
     else           state <= nextstate;
@@ -209,9 +226,14 @@ module DataAcquisitionIP_core(
   // Next‐state logic
   always_comb begin
     unique case (state)
-      IDLE:     nextstate = (CPUCommand != 32'd0 && CPUCommand[0]==0) ? BUSY : IDLE;
-      BUSY:     nextstate = sensorvalready[PSELx] ? COMPLETE : BUSY;
-      COMPLETE: nextstate = cpureadinput ? IDLE : COMPLETE;
+      
+          //TO BE REMOVEDD
+          //IDLE:     nextstate = (CPUCommand != 32'd0 && CPUCommand[0]==0) ? BUSY : IDLE;
+      IDLE:     nextstate = (CPUCommand != 32'd0)   ? BUSY : IDLE;
+      BUSY:     nextstate = sensorvalready[PSELx]   ? COMPLETE : BUSY;
+          //TO BE REMOVEDD
+          //COMPLETE: nextstate = cpureadinput            ? IDLE : COMPLETE;
+      COMPLETE: nextstate = STATUS_CLEAR            ? IDLE : COMPLETE;
       default:  nextstate = IDLE;
     endcase
   end
@@ -225,7 +247,9 @@ module DataAcquisitionIP_core(
     end else begin
       case (state)
         IDLE: begin
-          if (CPUCommand != 32'd0 && CPUCommand[0]==0)
+              //TO BE REMOVEDD
+              //if (CPUCommand != 32'd0 && CPUCommand[0]==0)
+          if (CPUCommand != 32'd0)
             cpucommandforparsing <= CPUCommand;
         end
         BUSY: begin
@@ -249,10 +273,13 @@ module DataAcquisitionIP_core(
   always_ff @(posedge Clk or negedge En) begin
     if (!En)
       err_sticky <= 1'b0;
+        //TO BE REMOVEDD
+        //else if (cpureadinput)
+    else if (STATUS_CLEAR)
+      err_sticky <= 1'b0;
     else if (state == COMPLETE)
       err_sticky <= (sensormeasdata[15:13] != 3'b001);
-    else if (cpureadinput)
-      err_sticky <= 1'b0;
+    
   end
 
   //–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––
