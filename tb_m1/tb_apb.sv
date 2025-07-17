@@ -1,5 +1,11 @@
 //TO DO: add documentation here later
 
+
+//I GOTTA UPDATE THIS TESTBENNCH TO SUPPORT LATCHED DONE, 8/16/32 Bit writes; and STATUS CLEAR;
+// (the fact that i've eliminated CPUCommand[0] because of read-modyfy-write conflict; and now
+// the command is also parsed different depending on PSELx)
+//after doing this i should be chill to move onto addding the per sensor memory
+
 `timescale 1ns/1ps
 
 module tb_apb;

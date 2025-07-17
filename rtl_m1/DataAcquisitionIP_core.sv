@@ -1,72 +1,56 @@
-/************************************************************************************************************
-Module: DataAcquisitionIP (V1.0)
-Author: Alan Peng
-Input: Clk, En (Global enable), CPU Command (32 Bits), SensorReadings (8 types, 16 bit each)
-
-Output: ResultForCPU (32 bits)
--------------------------------------------------------------------------------------------------------------
-This module implements the HDL logics of a data acquisition IP for on-chip wear-out sensors. It supports all sensor types developed
-at the Ivanov SoC Lab and up to 8 sensors of each type. Communication between the CPU and the sensor is implemented using the
-AMBA APB protocol. 
-
-For a typical data acquisition cycle, the CPU first selects a sensor that it intends to get data from, by setting PSELx and SensorIndex.
-It will then set a 32-bit command in the following format:
-CPU Command [31:30]: Mode (00 - Stop; 01 - Fast Mode; 10 - Slow Mode; 11 - Invalid)
-CPU Command [29:27]: PSELx (0 - None; 1 - ROSC; 2 - DC analog; 3 - 8 * EM Sensors; 4 - TDDB; 5 - SILC Slope; 6 - Temperature; 7 - Voltage)
-CPU Command [26:24]: SensorIndex (0 - 7, Max 8 sensors of each type)
-CPU Command [23:20]: ROSC / TDDB Measurement duration in terms of Number of Clock Cycles 
-CPU Command [19:14]: SILC Measurement duration in terms of Number of slopes
-CPU Command [13:2]: SILC TimeoutThreshold
-CPU Command [0]: CPU Reading Complete
-
-The above formatted command would be written to CPU Command Register through AMBA APB, read by the corresponding sensor.
-The sensor would undertake a measurement cycle and report a result to the Sensor Measurement Data Register through AMBA APB.
-The result is read by the CPU as a 32-bit data block, for ease of AMBA APB communication.
-
-The results are interprated in the following manner:
-ResultForCPU [31:16]: Measurement result
-ResultForCPU [15:13]: Error Code (1 - no error; 7 - timeout)
-ResultForCPU [0]: Measurement Ready for CPU
-
-NOTES:
-1. Please use Slow mode during 1st cycle after power up, fast mode would not provide any data as there is no previous measurement in memory
-2. Make sure to reset CPUCommands to 0 before starting another measurement cycle
-************************************************************************************************************/
-
-
 /*************************************************UPDATE 2025******************************************/
 /************************************************************************************************************
-Module: DataAcquisitionIP_core (V2.0)
-Author: Raul Vazquez Guerrero
-Inputs:
-  Clk             – global clock for measurement FSM
-  En              – global enable (active-high)
-  CPUCommand[31:0]– 32-bit command word from APB wrapper
-  SensorReadings  – 8 × 16-bit raw sensor inputs
-Outputs:
-  ResultForCPU[31:0] – 32-bit measurement result: [31:16]=value, [15:13]=error, [0]=ready
-  StatusBits[2:0]    – {busy, err_sticky, done}  {NEW}
 
-NOTES:
-1. The V1.0 DataAcquisitionIP was refactored into a pure DataAcquisitionIP_core by pulling all AMBA/APB bus logic
-into a separate wrapper leaving the core to focus solely on sensor FSM control and data flow.
-2. We added a 3-bit read-only STATUS register (busy/err_sticky/done) so the CPU can efficiently poll just the
-measurement state instead of reading the full 32 bit result word.
-************************************************************************************************************/
-//update these notes on V2.0 as rthey are now obsolete because of the new clear status bit and
-//  structure of CPUCommands reg
-
-
-
-
-
-
-/** Register map (APB offsets):
-//   0x00 = CPUCommand      // 32-bit command word  {w'll update it later to dynamic 8 and 32 bit}
-//   0x04 = STATUS          // read-only: {busy, err_sticky, done}
-//   0x08 = RESULT          // read-only: 32-bit measurement result
-//   0x0C = STATUS_CLEAR    // write-1-to-clear both err_sticky and done
-**/
+/**
+ * Module: DataAcquisitionIP_core (V2.0)
+ * Author: Raul Vazquez Guerrero (2025), based on Alan Peng (2024) (see first commit on this repo)
+ * 
+ * This module implements the HDL logics of a data acquisition IP for on-chip wear-out sensors. It supports all sensor types developed
+ * at the Ivanov SoC Lab and up to 8 sensors of each type. Communication between the CPU and the sensor is implemented using the
+ * AMBA APB protocol. 
+ *
+ * Inputs:
+ *   Clk              – global clock for measurement FSM
+ *   En               – global enable (active-high)
+ *   CPUCommand[31:0] – 32-bit command word from APB wrapper
+ *   STATUS_CLEAR     – write-1-to-clear latched status bits
+ *   SensorReadings   – 8 × 16-bit raw sensor inputs
+ *
+ * Outputs:
+ *   ResultForCPU[31:0] – 32-bit measurement result: [31:16]=value, [15:13]=error code, [0]=ready
+ *   StatusBits[2:0]    – {busy, err_sticky, done_latched}
+ *
+ * Register map (APB offsets):
+ *   0x00 = CPUCommandsReg
+ *   0x04 = STATUS         // {busy, err_sticky, done_latched}
+ *   0x08 = RESULT         // measurement result
+ *   0x0C = STATUS_CLEAR   // write-1-to-clear
+ *
+ * Conditional parsing of CPUCommand fields based on PSELx:
+ *   if PSELx == 3'b001 (ROSC) or 3'b100 (TDDB):
+ *     numclkcycles       = CPUCommand[23:20]
+ *     numdescendingslopes= 0
+ *     timeoutthreshold   = 0
+ *
+ *   else if PSELx == 3'b101 (SILC):
+ *     numclkcycles       = 0
+ *     numdescendingslopes= CPUCommand[23:18]
+ *     timeoutthreshold   = { CPUCommand[15:8], CPUCommand[7:4] }
+ *
+ *   else (DC, EM, Temperature, Voltage):
+ *     numclkcycles       = 0
+ *     numdescendingslopes= 0
+ *     timeoutthreshold   = 0
+ *
+ *
+ NOTES:
+ *   1. The V1.0 DataAcquisitionIP was refactored into a pure DataAcquisitionIP_core by pulling all AMBA/APB bus logic
+ *   into a separate wrapper leaving the core to focus solely on sensor FSM control and data flow.
+ *   2. We added a 3-bit read-only STATUS register (busy/err_sticky/done) so the CPU can efficiently poll just the
+ *   measurement state instead of reading the full 32 bit result word.
+ *   3. done_latched and err_sticky are cleared by STATUS_CLEAR.
+ *   4. busy is combinational.
+ */
 
 module DataAcquisitionIP_core(
   input  logic              Clk,
@@ -120,17 +104,33 @@ module DataAcquisitionIP_core(
   logic [31:0] sensormeasdata;
 
   //–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––
-  // 1) Parse the command fields
+  // 1) Parse the command fields (conditional because of dynamic 8 / 16 / 32 bit words)
   //–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––
   always_comb begin
-    mode               = cpucommandforparsing[31:30];
-    PSELx              = cpucommandforparsing[29:27];
-    SensorIndex        = cpucommandforparsing[26:24];
-    numclkcycles       = cpucommandforparsing[23:20];
-    numdescendingslopes= cpucommandforparsing[19:14];
-    timeoutthreshold   = cpucommandforparsing[13:2];
-        //TO BE REMOVEDD
+    mode        = cpucommandforparsing[31:30];
+    PSELx       = cpucommandforparsing[29:27];
+    SensorIndex = cpucommandforparsing[26:24];
+    unique case (PSELx)
+      3'b001, 3'b100: begin        // ROSC or TDDB
+        numclkcycles        = cpucommandforparsing[23:20];
+        numdescendingslopes = 6'd0;
+        timeoutthreshold    = 12'd0;
+      end
+      3'b101: begin               // SILC
+        numclkcycles        = 4'd0;
+        numdescendingslopes = cpucommandforparsing[23:18];
+        timeoutthreshold    = {cpucommandforparsing[15:8], cpucommandforparsing[7:4]};
+      end
+      default: begin              // DC, EM, Temperature, Voltage
+        numclkcycles        = 4'd0;
+        numdescendingslopes = 6'd0;
+        timeoutthreshold    = 12'd0;
+      end
+    endcase
+
+    //TO BE REMOVEDD {from my diagram}
         //cpureadinput       = CPUCommand[0];
+
   end
 
   //–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––
@@ -273,7 +273,7 @@ module DataAcquisitionIP_core(
             sensormeasdata[31:16] <= result[PSELx];
             sensormeasdata[15:13] <= errorcode[PSELx];
             sensormeasdata[12:1]  <= 12'd0;
-            sensormeasdata[0]     <= sensorvalready[PSELx];
+            sensormeasdata[0]     <= sensorvalready[PSELx]; //this line may be redundant cuz we already know that this is 1 (otherwise we wouldn;t have entered here in the first place)
           end
         end
         COMPLETE: begin
@@ -286,6 +286,9 @@ module DataAcquisitionIP_core(
   //–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––
   // 5) Sticky‐error latch
   //–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––
+
+      //to add this latch to my diagram {later}
+
   always_ff @(posedge Clk or negedge En) begin
     if (!En)
       err_sticky <= 1'b0;
