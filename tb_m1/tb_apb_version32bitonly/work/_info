@@ -8,30 +8,154 @@ z2
 !i10f 100
 cModel Technology
 d/home/raul
-vDataAcquisitionIP_apb
+vAcquireAnalogData
 Z0 DXx6 sv_std 3 std 0 22 AD7iAPLo6nTIKk<N0eo=D3
-Z1 !s110 1752162744
+Z1 !s110 1752163368
+!i10b 1
+!s100 [[bKHnjlf>OWTd8CO0LG<2
+I48Ph]32SklTz7da7:ebET3
+Z2 VDg1SIo80bB@j0V0VzS_@n1
+Z3 !s105 AnalogSensor_sv_unit
+S1
+Z4 d/home/raul/ltr-sensor-fusion-soc-peripheral/tb_m1/tb_apb_version32bitonly
+Z5 w1751674153
+Z6 8/home/raul/ltr-sensor-fusion-soc-peripheral/rtl_m1/AnalogSensor.sv
+Z7 F/home/raul/ltr-sensor-fusion-soc-peripheral/rtl_m1/AnalogSensor.sv
+L0 165
+Z8 OV;L;10.5b;63
+r1
+!s85 0
+31
+Z9 !s108 1752163368.000000
+Z10 !s107 /home/raul/ltr-sensor-fusion-soc-peripheral/rtl_m1/AnalogSensor.sv|
+Z11 !s90 -reportprogress|300|-work|work|-sv|-stats=none|/home/raul/ltr-sensor-fusion-soc-peripheral/rtl_m1/AnalogSensor.sv|
+!i113 1
+Z12 o-work work -sv
+Z13 tCvgOpt 0
+n@acquire@analog@data
+vAcquireEMData
+R0
+R1
+!i10b 1
+!s100 QcC]<XI8bzgcD@mK]h^ki3
+I06MlimeS;_GLc`09K8TRZ2
+R2
+Z14 !s105 EM_sv_unit
+S1
+R4
+R5
+Z15 8/home/raul/ltr-sensor-fusion-soc-peripheral/rtl_m1/EM.sv
+Z16 F/home/raul/ltr-sensor-fusion-soc-peripheral/rtl_m1/EM.sv
+L0 162
+R8
+r1
+!s85 0
+31
+R9
+Z17 !s107 /home/raul/ltr-sensor-fusion-soc-peripheral/rtl_m1/EM.sv|
+Z18 !s90 -reportprogress|300|-work|work|-sv|-stats=none|/home/raul/ltr-sensor-fusion-soc-peripheral/rtl_m1/EM.sv|
+!i113 1
+R12
+R13
+n@acquire@e@m@data
+vAnalogGetDataFSM
+R0
+R1
+!i10b 1
+!s100 _Gh]J<54EH4Nd`8W7[8Ug3
+Ik;2QAj?0C9Ym3G;mfd2=E3
+R2
+R3
+S1
+R4
+R5
+R6
+R7
+Z19 L0 54
+R8
+r1
+!s85 0
+31
+R9
+R10
+R11
+!i113 1
+R12
+R13
+n@analog@get@data@f@s@m
+vAnalogSensor
+R0
+R1
+!i10b 1
+!s100 4R2bU8g6a^U_AkJbm:Y6Z2
+Ib<5e1:]3o>U^Y_[nHIE1J0
+R2
+R3
+S1
+R4
+R5
+R6
+R7
+Z20 L0 13
+R8
+r1
+!s85 0
+31
+R9
+R10
+R11
+!i113 1
+R12
+R13
+n@analog@sensor
+vcounter
+R0
+R1
+!i10b 1
+!s100 ]2NTaJL_3Ti:7gLJ3;kC<0
+IQU:IaMkY[IRh>c:?ffnn:0
+R2
+Z21 !s105 ROSC_sv_unit
+S1
+R4
+R5
+Z22 8/home/raul/ltr-sensor-fusion-soc-peripheral/rtl_m1/ROSC.sv
+Z23 F/home/raul/ltr-sensor-fusion-soc-peripheral/rtl_m1/ROSC.sv
+L0 190
+R8
+r1
+!s85 0
+31
+R9
+Z24 !s107 /home/raul/ltr-sensor-fusion-soc-peripheral/rtl_m1/ROSC.sv|
+Z25 !s90 -reportprogress|300|-work|work|-sv|-stats=none|/home/raul/ltr-sensor-fusion-soc-peripheral/rtl_m1/ROSC.sv|
+!i113 1
+R12
+R13
+vDataAcquisitionIP_apb
+R0
+R1
 !i10b 1
 !s100 59J]cF1Sh7_EAIkYoVnkK2
 I=@l4?Be7mU>KSJVLX<YY[3
-Z2 VDg1SIo80bB@j0V0VzS_@n1
+R2
 !s105 DataAcquisitionIP_apb_sv_unit
 S1
-Z3 d/home/raul/ltr-sensor-fusion-soc-peripheral/tb_m1/tb_apb_version32bitonly
+R4
 w1752161905
 8/home/raul/ltr-sensor-fusion-soc-peripheral/rtl_m1/DataAcquisitionIP_apb.sv
 F/home/raul/ltr-sensor-fusion-soc-peripheral/rtl_m1/DataAcquisitionIP_apb.sv
 L0 7
-Z4 OV;L;10.5b;63
+R8
 r1
 !s85 0
 31
-Z5 !s108 1752162744.000000
+R9
 !s107 /home/raul/ltr-sensor-fusion-soc-peripheral/rtl_m1/DataAcquisitionIP_apb.sv|
 !s90 -reportprogress|300|-work|work|-sv|-stats=none|/home/raul/ltr-sensor-fusion-soc-peripheral/rtl_m1/DataAcquisitionIP_apb.sv|
 !i113 1
-Z6 o-work work -sv
-Z7 tCvgOpt 0
+R12
+R13
 n@data@acquisition@i@p_apb
 vDataAcquisitionIP_core
 R0
@@ -42,19 +166,243 @@ I8VdKPR<nkAEWGD1K2NATm2
 R2
 !s105 DataAcquisitionIP_core_sv_unit
 S1
-R3
+R4
 w1752030937
 8/home/raul/ltr-sensor-fusion-soc-peripheral/rtl_m1/DataAcquisitionIP_core.sv
 F/home/raul/ltr-sensor-fusion-soc-peripheral/rtl_m1/DataAcquisitionIP_core.sv
 L0 57
-R4
+R8
 r1
 !s85 0
 31
-R5
+R9
 !s107 /home/raul/ltr-sensor-fusion-soc-peripheral/rtl_m1/DataAcquisitionIP_core.sv|
 !s90 -reportprogress|300|-work|work|-sv|-stats=none|/home/raul/ltr-sensor-fusion-soc-peripheral/rtl_m1/DataAcquisitionIP_core.sv|
 !i113 1
-R6
-R7
+R12
+R13
 n@data@acquisition@i@p_core
+vEM
+R0
+R1
+!i10b 1
+!s100 SB4N>`cMna:e2b?lc08Kh0
+IfEFjkcgaQ77=d04ZPfZ1^0
+R2
+R14
+S1
+R4
+R5
+R15
+R16
+R20
+R8
+r1
+!s85 0
+31
+R9
+R17
+R18
+!i113 1
+R12
+R13
+n@e@m
+vGetEMReadingFSM
+R0
+R1
+!i10b 1
+!s100 A>ncVgic]=<AE7ej<71VY3
+I`ZcMfC@l1XAjWLMH_^^gP1
+R2
+R14
+S1
+R4
+R5
+R15
+R16
+R19
+R8
+r1
+!s85 0
+31
+R9
+R17
+R18
+!i113 1
+R12
+R13
+n@get@e@m@reading@f@s@m
+vGetSlopeFSM
+R0
+R1
+!i10b 1
+!s100 fMlo24g:1:QjGE=MmMmb52
+IXcTeQ?RU7=9F<ki4B_NkW2
+R2
+Z26 !s105 SILC_sv_unit
+S1
+R4
+R5
+Z27 8/home/raul/ltr-sensor-fusion-soc-peripheral/rtl_m1/SILC.sv
+Z28 F/home/raul/ltr-sensor-fusion-soc-peripheral/rtl_m1/SILC.sv
+L0 246
+R8
+r1
+!s85 0
+31
+R9
+Z29 !s107 /home/raul/ltr-sensor-fusion-soc-peripheral/rtl_m1/SILC.sv|
+Z30 !s90 -reportprogress|300|-work|work|-sv|-stats=none|/home/raul/ltr-sensor-fusion-soc-peripheral/rtl_m1/SILC.sv|
+!i113 1
+R12
+R13
+n@get@slope@f@s@m
+vROSC
+R0
+R1
+!i10b 1
+!s100 5@NcB^1Bb:i0Jedz^o>a]1
+IlO>:8d^1`0DQC@MOS4X0k2
+R2
+R21
+S1
+R4
+R5
+R22
+R23
+L0 16
+R8
+r1
+!s85 0
+31
+R9
+R24
+R25
+!i113 1
+R12
+R13
+n@r@o@s@c
+vROSCgetdataFSM
+R0
+R1
+!i10b 1
+!s100 mCVGGVh9_o_MB`2Q2N4370
+I7OL?T4[>AAa8iFO6Jo?N30
+R2
+R21
+S1
+R4
+R5
+R22
+R23
+L0 77
+R8
+r1
+!s85 0
+31
+R9
+R24
+R25
+!i113 1
+R12
+R13
+n@r@o@s@cgetdata@f@s@m
+vSILC
+R0
+R1
+!i10b 1
+!s100 ]TVJ<GeoYCR3h?KB:?4`73
+I^818La3E1kOLE]?6]8AC?2
+R2
+R26
+S1
+R4
+R5
+R27
+R28
+L0 24
+R8
+r1
+!s85 0
+31
+R9
+R29
+R30
+!i113 1
+R12
+R13
+n@s@i@l@c
+vSILCgetdataFSM
+R0
+R1
+!i10b 1
+!s100 nQlmGJakN2CS2oP:2lS[I0
+IP>n<^GiTlRFm;lz]MYHWA3
+R2
+R26
+S1
+R4
+R5
+R27
+R28
+L0 98
+R8
+r1
+!s85 0
+31
+R9
+R29
+R30
+!i113 1
+R12
+R13
+n@s@i@l@cgetdata@f@s@m
+vSlopeCounter
+R0
+R1
+!i10b 1
+!s100 YDdck_M[VOi2>UVjYbZ[R1
+I_]cK3z0R^6egibdB:YFRf2
+R2
+R26
+S1
+R4
+R5
+R27
+R28
+L0 374
+R8
+r1
+!s85 0
+31
+R9
+R29
+R30
+!i113 1
+R12
+R13
+n@slope@counter
+vtb_apb
+R0
+R1
+!i10b 1
+!s100 RH:@@A=`XkMVNcThc?jL:3
+IQV?BhJ3nG<>eSoJ>jNAEY1
+R2
+!s105 tb_apb_sv_unit
+S1
+R4
+w1752163091
+8/home/raul/ltr-sensor-fusion-soc-peripheral/tb_m1/tb_apb.sv
+F/home/raul/ltr-sensor-fusion-soc-peripheral/tb_m1/tb_apb.sv
+L0 5
+R8
+r1
+!s85 0
+31
+R9
+!s107 /home/raul/ltr-sensor-fusion-soc-peripheral/tb_m1/tb_apb.sv|
+!s90 -reportprogress|300|-work|work|-sv|-stats=none|/home/raul/ltr-sensor-fusion-soc-peripheral/tb_m1/tb_apb.sv|
+!i113 1
+R12
+R13

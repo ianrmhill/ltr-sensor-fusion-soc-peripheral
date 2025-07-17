@@ -15,6 +15,8 @@ module tb_apb;
   // Dummy sensor inputs: only type-2 (DCAnalog) matters here
   logic [7:0][15:0] SensorReadings;
 
+  logic [31:0] cmd;
+
   // Device Under Test
   DataAcquisitionIP_apb dut (
     .PCLK          (PCLK),
@@ -57,9 +59,9 @@ module tb_apb;
 
     // Write a Slow-mode DC-Analog command:
     // mode=2'b10 (Slow), PSELx=3'b010 (type 2), idx=0, other fields=0, clear-bit=0
-    logic [31:0] cmd = {2'b10,3'b010,3'b000, 4'd0,6'd0,12'd0, 1'b0};
+    cmd = {2'b10,3'b010,3'b000, 4'd0,6'd0,12'd0, 1'b0};
     apb_write(8'h00, cmd);
-
+    
     // Poll STATUS @0x04 until done==1
     do begin
       apb_read(8'h04);
