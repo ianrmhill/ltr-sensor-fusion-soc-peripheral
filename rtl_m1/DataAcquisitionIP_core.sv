@@ -80,9 +80,11 @@ module DataAcquisitionIP_core(
 
   //–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––
   // Internal status signals
-  logic busy;         // high while measurement in progress
-  logic done;         // pulses high on completion until STATUS_CLEAR
-  logic err_sticky;   // latches any non-001 error until STATUS_CLEAR
+  logic busy;           // high while measurement in progress
+      //TO BE REMOVEDD
+      //logic done;  {now im driving this dignal on ff}
+  logic done_latched;   // pulses high on completion until STATUS_CLEAR
+  logic err_sticky;     // latches any non-001 error until STATUS_CLEAR
   //–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––
 
   // Capture the command word when entering BUSY
@@ -157,7 +159,9 @@ module DataAcquisitionIP_core(
     (PSELx == 1) && (SensorIndex == 0),
     ROSCReading, Clk,
     numclkcycles,
-    cpureadinput,
+        //TO BE REMOVEDD
+        //cpureadinput,
+    STATUS_CLEAR,
     result[1], errorcode[1], sensorvalready[1]
   );
 
@@ -165,7 +169,9 @@ module DataAcquisitionIP_core(
     mode,
     (PSELx == 2) && (SensorIndex == 0),
     DCAnalogReading, Clk,
-    cpureadinput,
+        //TO BE REMOVEDD
+        //cpureadinput,
+    STATUS_CLEAR,
     result[2], errorcode[2], sensorvalready[2]
   );
 
@@ -173,7 +179,9 @@ module DataAcquisitionIP_core(
     mode,
     (PSELx == 3) && (SensorIndex == 0),
     EMReading, Clk,
-    cpureadinput,
+        //TO BE REMOVEDD
+        //cpureadinput,
+    STATUS_CLEAR,
     result[3], errorcode[3], sensorvalready[3]
   );
 
@@ -182,7 +190,9 @@ module DataAcquisitionIP_core(
     (PSELx == 4) && (SensorIndex == 0),
     TDDBReading, Clk,
     numclkcycles,
-    cpureadinput,
+        //TO BE REMOVEDD
+        //cpureadinput,
+    STATUS_CLEAR,
     result[4], errorcode[4], sensorvalready[4]
   );
 
@@ -191,7 +201,9 @@ module DataAcquisitionIP_core(
     (PSELx == 5) && (SensorIndex == 0),
     SILCADCReading, Clk,
     numdescendingslopes, timeoutthreshold,
-    cpureadinput,
+        //TO BE REMOVEDD
+        //cpureadinput,
+    STATUS_CLEAR,
     result[5], errorcode[5], sensorvalready[5]
   );
 
@@ -199,7 +211,9 @@ module DataAcquisitionIP_core(
     mode,
     (PSELx == 6) && (SensorIndex == 0),
     TemperatureReading, Clk,
-    cpureadinput,
+        //TO BE REMOVEDD
+        //cpureadinput,
+    STATUS_CLEAR,
     result[6], errorcode[6], sensorvalready[6]
   );
 
@@ -207,7 +221,9 @@ module DataAcquisitionIP_core(
     mode,
     (PSELx == 7) && (SensorIndex == 0),
     VoltageReading, Clk,
-    cpureadinput,
+        //TO BE REMOVEDD
+        //cpureadinput,
+    STATUS_CLEAR,
     result[7], errorcode[7], sensorvalready[7]
   );
 
@@ -283,18 +299,34 @@ module DataAcquisitionIP_core(
   end
 
   //–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––
+  // 5B) Done‐latch
+  //–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––
+  always_ff @(posedge Clk or negedge En) begin
+    if (!En)
+      done_latched <= 1'b0;
+    else if (STATUS_CLEAR)
+      done_latched <= 1'b0;
+    else if (state == COMPLETE)
+      done_latched <= 1'b1;
+  end
+
+
+  //–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––
   // 6) Combinational status signals
   //–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––
   always_comb begin
-    busy = (state == BUSY);
-    done = (state == COMPLETE);
+    busy = (state == BUSY);   //{now only combinational status signal cuz err and done are latched now}
+        //TO BE REMOVEDD
+        //done = (state == COMPLETE);
   end
 
   //–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––
   // 7) Pack into the 3-bit StatusBits output
   //–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––
   always_comb begin
-    StatusBits = { busy, err_sticky, done };
+        //TO BE REMOVEDD
+        //StatusBits = { busy, err_sticky, done };   {now i defined done to be in ff so that i can clear it from the CPU}
+    StatusBits = { busy, err_sticky, done_latched };
   end
 
 endmodule
