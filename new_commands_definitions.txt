@@ -1,0 +1,288 @@
+***NOTE: check later with Ian if he want a signed 16-bit result [cuz Raw-REFx != REFx-Raw (one of those is negaive)]
+
+REF1 is stored in non-volatile memory which should store the first sensor measurement ever made @ system start-up
+REF2 should store the first sensor measurement made
+
+----------------CPU Commands Register------------------
+
+Note: Unless, we want to read or write REF1 or REF2 through the References Configuration bits
+    A measurement of:
+        DC Analog   - one byte instruction on CMD0
+        EM          - one byte instruction on CMD0
+        Tempreature - one byte instruction on CMD0
+        Voltage     - one byte instruction on CMD0
+        ROSC        - half word instruction on CMD0 and CMD1
+        TDDB        - half word instruction on CMD0 and CMD1
+        SILC        - full word instruction on CMD0, CMD1, CMD2 and CMD3
+
+*******CMD0 = CPUCommands [31:24]*******
+CPUCommands[31:30] - Mode
+00: slow; raw measurement
+01: slow, raw measurement - REF1
+10: slow, raw measurement - REF2
+11: fast, capture last successful measurement
+
+CPUCommands[29:27] - PSELx
+000 Reserved
+001 ROSC
+010 DC Analog
+011 EM
+100 TDDB
+101 SILC
+110 Temperature
+111 Voltage
+
+CPUCommands[26:24] - Index
+000 Index0
+001 Index1
+010 Index2
+011 Index3
+100 Index4
+101 Index5
+110 Index6
+111 Index7
+
+
+*******CMD1 = CPUCommands [23:18]*******
+if ROSC or TDDB:
+    [23:20] Clock cycles
+    [19:16] Reserved
+
+if SILC:
+    [23:18] Slopes
+    [17:16] Reserved
+
+
+*******CMD2 = CPUCommands [15:8]*******
+only for SILC  
+    [15:18] Timeout MSB
+
+
+*******CMD3 = CPUCommands [7:0]*******
+only for SILC
+    [7:4] Timeout LSB
+for ALL sensors
+    [3:0] References Congifguration (only different than 0000 when reading or writing to REF1 or REF2)
+        0000 Reserved (this would allow me to still send a single 8-bit instruction on CMD0 for DC, EM, Temp, Voltage if we dont want to read or write to REF1 or REF2 [keeping CMD3 zeroed])
+        0001 Print REF1
+        0010 Write/Overwrite REF1 in non-volatile memory
+        0011 Print REF2
+        0100 Write/Overwrite REF2
+        0101 Write/Overwrite both REF1 and REF2 to same measured value
+        0110-1111 Reserved
+
+-------------Result Register---------------
+Result[31:16] - 16 bit measurement
+
+Result [15:13] - Error code:
+000 Fast mode error
+001 Measurement valid (for either slow or fast measurement)
+010 REF1 missing to provide result
+011 REF2 missing to provide result
+100 Fast mode measurement underway
+101 Slow mode measurement underway
+110 Valid measurement and valid write/overwrite to REF (either REF1 or REF2)
+111 Timeout error (SILC)
+
+Result[12:10] - REF_TAG (used to keep track of last slow measurement type so that fast measurement is meaninful if we forget about last slow measurement type)
+000 Raw measurement
+001 Raw - REF1
+010 Raw - REF2
+011 REF1
+100 REF2
+101 Reserved
+111 Reserved
+111 Error
+
+-----------------------------------------------------------------------------
+Scenario universe (taking a DC Analog measurement at index=0 as an example)
+------------------------------------------------------------------------------
+
+* The first time ever I connect this dc analog sensor to the ip block, it's corresponding non-volatile memory for REF1 will be zeroed
+
+////NOTE: CAN ALSO DO AUTOMATIC CAPTURE since at startup ref1_valid=ref2_valid =0
+
+------------WORKFLOW @ Start-up [populating REF1 and REF2]--------------
+Notes:
+1. Both REF1 and REF2 are NULL
+2. This is an ONLY-slow type of meausrement of mode [00]
+
+CPUCommand
+    Mode:                        00 | PSELx: 010 | Index: 000     {CMD0}
+    {CMD1 and CMD2 are zero}
+    References Configuration:    0101 (write/ow REF1 and REF2)    {LSB of CMD3}    //could also do 0010 or 0100 to individually write REF1 and REF2 respectively in two transactions
+Result
+    16-bit measurement
+    Error code: 110 (valid measurement and valid write/OW to REFx)
+    REF_TAG:    000 (raw)
+
+
+------------WORKFLOW @ Power-up [populating REF2]--------------
+Notes:
+1. REF1 already contains valid data
+2. This is an ONLY-slow type of meausrement of mode [00]
+
+CPUCommand
+    Mode:                        00 | PSELx: 010 | Index: 000     {CMD0}
+    {CMD1 and CMD2 are zero}
+    References Configuration:    0100 (write/ow REF2)             {LSB of CMD3}
+Result
+    16-bit measurement
+    Error code: 110 (valid measurement and valid write/OW to REFx)
+    REF_TAG:    000 (raw)
+
+
+--------------SLOW Mode Measurements [REF1 and REF2 containing valid data]---------
+****SLOW - Raw Measurement****
+Note:
+1. For a raw measurement, REF1 or REF2 are actually not needed so even if they are NULL, this would be a successful transaction {i thought of this many times and i think this is best}
+
+CPUCommand
+    Mode:                        00 | PSELx: 010 | Index: 000     {CMD0}
+    {CMD1, CMD2 and CMD3 are zero}
+Result
+    16-bit measurement
+    Error code: 001 (valid measurement)
+    REF_TAG:    000 (raw)
+
+****SLOW - (Raw - REF1)****
+CPUCommand
+    Mode:                        01 | PSELx: 010 | Index: 000     {CMD0}
+    {CMD1, CMD2 and CMD3 are zero}
+Result
+    16-bit measurement
+    Error code: 001 (valid measurement)
+    REF_TAG:    001 (Raw - REF1)
+
+****SLOW - (Raw - REF2)****
+CPUCommand
+    Mode:                        10 | PSELx: 010 | Index: 000     {CMD0}
+    {CMD1, CMD2 and CMD3 are zero}
+Result
+    16-bit measurement
+    Error code: 001 (valid measurement)
+    REF_TAG:    010 (Raw - REF2)
+
+
+--------------FAST Mode Measurements [with a valid previous slow measurement]---------
+****Previous SLOW measurment was of type [00]****
+Note:
+1. Since last SLOW measurement [00] didn't involve REF1 or REF2, REGARDLESS of whether either reference exists or NOT,
+    this fast mode transaction would be valid.
+2. note that when we write or OW either of REF1 or REF2 or both at the same time, the REF_TAG is always 000 (raw); this is to keep
+    things simpler; only when one explicitly prints either of them using the Reference Configuration Bits, then the REF_TAG specifies
+    if its REF1 or REF2
+4. also, note that a fast mode measuremnt would actually not check if REF1 or REF2 exist as the last SLOW measurement would've checked for that
+    (if it was of the type [01] or [10])
+
+CPUCommand
+    Mode:                        11 | PSELx: 010 | Index: 000     {CMD0}
+    {CMD1, CMD2 and CMD3 are zero}
+Result
+    16-bit measurement
+    Error code: 001 (valid measurement)
+    REF_TAG:    000 (raw)
+
+****Previous SLOW measurment was of type [01]****
+CPUCommand
+    Mode:                        11 | PSELx: 010 | Index: 000     {CMD0}
+    {CMD1, CMD2 and CMD3 are zero}
+Result
+    16-bit measurement
+    Error code: 001 (valid measurement)
+    REF_TAG:    001 (raw - REF1)
+
+****Previous SLOW measurment was of type [10]****
+CPUCommand
+    Mode:                        11 | PSELx: 010 | Index: 000     {CMD0}
+    {CMD1, CMD2 and CMD3 are zero}
+Result
+    16-bit measurement
+    Error code: 001 (valid measurement)
+    REF_TAG:    010 (raw - REF2)
+
+****Previous measurement was ALSO a FAST mode****
+Note:
+1. if previous measurement was also FAST, note that REF_TAG would still hold the last SLOW measurement tag [whether it was 00, 01 or 10]
+
+
+--------------Printing REF1 or REF2 for debugging (or curiosity lol) purposes---------
+Note:
+1. as noted above, to use the References Configuration bits on CPUCommand[3:0] (other than ofc its defaulted 0000), Mode has to be [00]
+****Printing REF1 when REF1 exists****
+CPUCommand
+    Mode:                        00 | PSELx: 010 | Index: 000     {CMD0}
+    {CMD1 and CMD2 are zero}
+    References Configuration:    0001 (print REF1)                {LSB of CMD3}
+Result
+    16-bit measurement
+    Error code: 001 (valid measurement)
+    REF_TAG:    011 (REF1)
+
+****Printing REF1 when REF1 does not exist****
+CPUCommand
+    Mode:                        00 | PSELx: 010 | Index: 000     {CMD0}
+    {CMD1 and CMD2 are zero}
+    References Configuration:    0001 (print REF1)                {LSB of CMD3}
+Result
+    16'b0
+    Error code: 010 (REF1 missing)
+    REF_TAG:    111 (Error)
+
+****Printing REF2 when REF2 exists****
+CPUCommand
+    Mode:                        00 | PSELx: 010 | Index: 000     {CMD0}
+    {CMD1 and CMD2 are zero}
+    References Configuration:    0011 (print REF2)                {LSB of CMD3}
+Result
+    16-bit measurement
+    Error code: 001 (valid measurement)
+    REF_TAG:    100 (REF2)
+
+****Printing REF2 when REF2 does not exist****
+CPUCommand
+    Mode:                        00 | PSELx: 010 | Index: 000     {CMD0}
+    {CMD1 and CMD2 are zero}
+    References Configuration:    0011 (print REF2)                {LSB of CMD3}
+Result
+    16'b0
+    Error code: 011 (REF2 missing)
+    REF_TAG:    111 (Error)
+
+
+-----------------------------------Overwriting REF1 or REF2-------------------------------
+Note:
+1. This would work exactly the same as if we were populating REF1 and REF2 at start-up as descrbed above, and ofc this is a needed capabailty in our system
+
+--------------------ERRORS: SLOW Mode Measurements (REF1 or REF2 needed for measurement and missing)----------------
+****(Raw - REF1) but REF1 missing****
+CPUCommand
+    Mode:                        01 | PSELx: 010 | Index: 000     {CMD0}
+    {CMD1, CMD2 and CMD3 are zero}
+Result
+    16'b0
+    Error code: 010 (REF1 missing)
+    REF_TAG:    111 (Error)
+
+****(Raw - REF2) but REF2 missing****
+CPUCommand
+    Mode:                        10 | PSELx: 010 | Index: 000     {CMD0}
+    {CMD1, CMD2 and CMD3 are zero}
+Result
+    16'b0
+    Error code: 011 (REF2 missing)
+    REF_TAG:    111 (Error)
+
+--------------------ERRORS: FAST Mode Measurements (no previous SLOW measurement done)----------------
+Note:
+1. actually previous ip block architecture (2024) didn't send an error on this scenario so good to have now
+****@Start-up or @Power-up (no previous data on buffer so error)****
+CPUCommand
+    Mode:                        11 | PSELx: 010 | Index: 000     {CMD0}
+    {CMD1 and CMD2 are zero}
+    References Configuration:    0001 (print REF1)                {LSB of CMD3}
+Result
+    16'b0
+    Error code: 000 (fast mode error)
+    REF_TAG:    111 (Error)
+

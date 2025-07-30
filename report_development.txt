@@ -1,0 +1,7 @@
+//add memory map | volatilty | width | implementation note
+- Last Slow Result
+- REF1
+- REF1_valid
+- REF2
+- REF2_valid
+- REF_TAG

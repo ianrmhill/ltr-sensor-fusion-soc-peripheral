@@ -18,6 +18,9 @@
  *                   011=EM, 100=TDDB, 101=SILC, 110=Temperature, 111=Voltage)
  *     [2:0] = Sensor Index (0–7)
  *
+
+//////////////FIXXXX
+
  *   CMD1 [15:8]:
  *     - For ROSC/TDDB (PSELx=001 or 100): bits [3:0] = Measurement Duration (# clock cycles)
  *     - For SILC (PSELx=101): bits [5:0] = SILC slope count

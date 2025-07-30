@@ -3,7 +3,7 @@
 
 /**
  * Module: DataAcquisitionIP_core (V2.0)
- * Author: Raul Vazquez Guerrero (2025), based on Alan Peng (2024) (see first commit on this repo)
+ * Author: Raul Vazquez Guerrero (2025), based on Alan Peng's work (2024) (see first commit on this repo)
  * 
  * This module implements the HDL logics of a data acquisition IP for on-chip wear-out sensors. It supports all sensor types developed
  * at the Ivanov SoC Lab and up to 8 sensors of each type. Communication between the CPU and the sensor is implemented using the
@@ -17,7 +17,7 @@
  *   SensorReadings   – 8 × 16-bit raw sensor inputs
  *
  * Outputs:
- *   ResultForCPU[31:0] – 32-bit measurement result: [31:16]=value, [15:13]=error code, [0]=ready
+ *   ResultForCPU[31:0] – {value[31:16], ERR[15:13], REF_TAG[12:10], reserved[9:0]}
  *   StatusBits[2:0]    – {busy, err_sticky, done_latched}
  *
  * Register map (APB offsets):
@@ -50,6 +50,29 @@
  *   measurement state instead of reading the full 32 bit result word.
  *   3. done_latched and err_sticky are cleared by STATUS_CLEAR.
  *   4. busy is combinational.
+ *
+ *
+ *
+ * New in V2.1
+ * -----
+ *   1. Mode[31:30] repurposed as {REF_SEL, speed}:
+ *       00 Slow-RAW        01 Slow-RAW-REF1
+ *       10 Slow-RAW-REF2   11 FAST (return last slow result)
+ *   2. CMD3[3:0] “Reference Configuration” nibble:
+ *       0000 default {reserved}
+ *       0001 Print REF1       0010 Overwrite REF1
+ *       0011 Print REF2       0100 Overwrite REF2
+ *       0101 Overwrite both   others reserved
+ *   3. Per-sensor memories added: REF1 (non-volatile), REF2 (volatile),
+ *     valid bits, and last_ref_tag.
+ *   4. Result[12:10] carries REF_TAG so firmware knows source of FAST data.
+ *   5. Expanded ERR codes. (see new_commands_definitions.txt)
+ *
+ *
+ *
+ *
+ *
+ *
  */
 
 module DataAcquisitionIP_core(
