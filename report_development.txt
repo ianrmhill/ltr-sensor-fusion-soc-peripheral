@@ -1,3 +1,8 @@
+//STATUS_BITS addition
+//STATUS_CLEAR addition
+
+//show how CPUCommands and Result were refactored
+
 //add memory map | volatilty | width | implementation note
 - Last Slow Result
 - REF1

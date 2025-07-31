@@ -99,12 +99,19 @@ module DataAcquisitionIP_core(
     logic        ref2_v   [7:0][7:0];
     logic [1:0]  last_ref_tag [7:0][7:0];  // 00/01/10
 
-    // POR (power up) detector
+    // POR (power up) detector (goes high at ckl edge with en=1)
     logic por_seen;
-    initial por_seen = 1'b0;
-    always_ff @(posedge Clk or negedge En)
-      if (!En) por_seen <= 1'b0;
-      else     por_seen <= 1'b1;
+    always_ff @(posedge Clk or negedge En) begin
+      if (!En) por_seen <= 1'b0; //when chip on reset
+      else     por_seen <= 1'b1; //active ip block (for autocapture of REF2)
+    end
+
+    //new signals that FSM needs on measurement part added to implmenet V2.1 functionality (description of each signal inside FSM for clarity)
+    logic [15:0] val_raw;
+    logic [2:0] raw_err;
+    logic [15:0] val_final;;
+    logic [2:0]  err_code;
+    logic [2:0]  ref_tag;
 
   //––––––––––––––––––––––––––––––––––––––––––––––––––––––––––
 
@@ -326,10 +333,11 @@ module DataAcquisitionIP_core(
           //  val_raw = fresh reading from sensor wrapper
           //  err_code is preset to 001 [success)
           //  ref_tag is preset to 000 (ra)w
-          logic [15:0] val_raw   = sensormeasdata[31:16]; //raw result 16-bit word
-          logic [15:0] val_final;                         //final value we'll return
-          logic [2:0]  err_code  = 3'b001;                //assume valid
-          logic [2:0]  ref_tag   = 3'b000;                //default RAW
+          val_raw   = sensormeasdata[31:16]; //raw result 16-bit word
+          raw_err = sensormeasdata[15:13];   // i added it to track a FAST measurement error if first command at start-up or POR is mode 11 (fast)
+          //val_final;                         //final value we'll return
+          err_code  = 3'b001;                //assume valid
+          ref_tag   = 3'b000;                //default RAW
 
           //-----Auto capture logic (only after a successful RAW (mode00))------
           //---we check if REF1 is empty (like @start-up)---
@@ -364,7 +372,33 @@ module DataAcquisitionIP_core(
             end            
           end
     
-          // Subtraction / REF selection
+          // ---------- PRINT REF1 / REF2 ----------
+          if (mode==2'b00 && (ref_cfg==4'b0001 || ref_cfg==4'b0011)) begin
+              if (ref_cfg == 4'b0001) begin                 // we print REF1
+                  if (ref1_v[PSELx][SensorIndex]) begin
+                      val_final = ref1_mem[PSELx][SensorIndex];
+                      ref_tag   = 3'b011;                   //REF1
+                      err_code  = 3'b001; 
+                  end else begin
+                      val_final = 16'd0;
+                      ref_tag   = 3'b111; //error
+                      err_code  = 3'b010;                   //REF1 missing
+                  end
+              end
+              else begin                                    //we print REF2
+                  if (ref2_v[PSELx][SensorIndex]) begin
+                      val_final = ref2_mem[PSELx][SensorIndex];
+                      ref_tag   = 3'b100;                   // REF2
+                      err_code  = 3'b001;
+                  end else begin
+                      val_final = 16'd0;
+                      ref_tag   = 3'b111; //error
+                      err_code  = 3'b011;                   // REF2 missing
+                  end
+              end
+          end
+          else begin
+          // -----------NORMAL measurements-------------
           unique case (mode)
             2'b00: begin           //SLOW raw
               val_final = val_raw;
@@ -393,20 +427,27 @@ module DataAcquisitionIP_core(
                 err_code  = 3'b011;  // REF2 missing
               end
             end
-            2'b11: begin  // FAST
-              val_final = val_raw;          // sensor wrapper gave last value stoed in 'recordedvalue'
-              //and here we label the fast mesaurement reusult with the last slow measurement type
-              ref_tag   = (last_ref_tag[PSELx][SensorIndex]==2'b01)?3'b001:
-                           (last_ref_tag[PSELx][SensorIndex]==2'b10)?3'b010:
-                           3'b000;
+            2'b11: begin   // FAST
+              if (raw_err == 3'b010) begin           //when sensor wrapper sais 'FastOnly'
+                  val_final = 16'd0;
+                  ref_tag   = 3'b111;                //error
+                  err_code  = 3'b000;                //fast mode error
+              end else begin
+                  val_final = val_raw; // sensor wrapper gave last value stoed in 'recordedvalue'
+                  //and here we label the fast mesaurement reusult with the last slow measurement type
+                  ref_tag = (last_ref_tag[PSELx][SensorIndex]==2'b01) ? 3'b001 :
+                            (last_ref_tag[PSELx][SensorIndex]==2'b10) ? 3'b010 :
+                            3'b000;
+              end
             end
           endcase
+        end
 
-          // Pack final result
-          ResultForCPU[31:16] <= val_final;
-          ResultForCPU[15:13] <= err_code;
-          ResultForCPU[12:10] <= ref_tag;
-          ResultForCPU[9:0]   <= 10'd0;      // reserved
+      // Pack final result
+      ResultForCPU[31:16] <= val_final;
+      ResultForCPU[15:13] <= err_code;
+      ResultForCPU[12:10] <= ref_tag;
+      ResultForCPU[9:0]   <= 10'd0;      // reserved
 
         end
       endcase
