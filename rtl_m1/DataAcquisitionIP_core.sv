@@ -67,12 +67,6 @@
  *     valid bits, and last_ref_tag.
  *   4. Result[12:10] carries REF_TAG so firmware knows source of FAST data.
  *   5. Expanded ERR codes. (see new_commands_definitions.txt)
- *
- *
- *
- *
- *
- *
  */
 
 module DataAcquisitionIP_core(
@@ -94,16 +88,37 @@ module DataAcquisitionIP_core(
   logic err_sticky;     // latches any non-001 error until STATUS_CLEAR
   //–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––
 
+  // NEW
+  //–––––––––––––––––––––––––––––––––––––––––
+  // Refernece memories
+  //array of 8 types of sensors (in reality 7 but 000 doesnt count on PSEL) * 8 instances of 16-bit each
+    logic [15:0] ref1_mem [7:0][7:0];  //how im modeling non-volatile
+    logic [15:0] ref2_mem [7:0][7:0];
+
+    logic        ref1_v   [7:0][7:0]; //modeled non-volatile
+    logic        ref2_v   [7:0][7:0];
+    logic [1:0]  last_ref_tag [7:0][7:0];  // 00/01/10
+
+    // POR (power up) detector
+    logic por_seen;
+    initial por_seen = 1'b0;
+    always_ff @(posedge Clk or negedge En)
+      if (!En) por_seen <= 1'b0;
+      else     por_seen <= 1'b1;
+
+  //––––––––––––––––––––––––––––––––––––––––––––––––––––––––––
+
   // Capture the command word when entering BUSY
   logic [31:0] cpucommandforparsing;
 
   // Decoded fields from the captured command
-  logic [1:0]  mode;
+  logic [1:0]  mode; // now differen in V2.1
   logic [2:0]  PSELx;
   logic [2:0]  SensorIndex;
   logic [3:0]  numclkcycles;
   logic [5:0]  numdescendingslopes;
   logic [11:0] timeoutthreshold;
+  logic [3:0]  ref_cfg; //NEW addition ; // references configuration
 
             //TO BE REMOVEDD
             // Direct “CPU read complete” bit from the live input
@@ -133,6 +148,7 @@ module DataAcquisitionIP_core(
     mode        = cpucommandforparsing[31:30];
     PSELx       = cpucommandforparsing[29:27];
     SensorIndex = cpucommandforparsing[26:24];
+    ref_cfg     = cpucommandforparsing[3:0];   //NEW in V2.1
     unique case (PSELx)
       3'b001, 3'b100: begin        // ROSC or TDDB
         numclkcycles        = cpucommandforparsing[23:20];
@@ -295,12 +311,103 @@ module DataAcquisitionIP_core(
           if (sensorvalready[PSELx]) begin
             sensormeasdata[31:16] <= result[PSELx];
             sensormeasdata[15:13] <= errorcode[PSELx];
-            sensormeasdata[12:1]  <= 12'd0;
-            sensormeasdata[0]     <= sensorvalready[PSELx]; //this line may be redundant cuz we already know that this is 1 (otherwise we wouldn;t have entered here in the first place)
+            sensormeasdata[12:0]  <= 12'd0; // cleare although core repacks [12:10] (REF_TAG) later
           end
         end
         COMPLETE: begin
-          ResultForCPU <= sensormeasdata;
+          
+          /***NEW this section completely refactored In v2.1***/
+          // 1. we post process raw
+          // 2. we apply REF subtraction if needed
+          // 3. we build ERR & REF_TAG
+
+
+          // Notes --> every scenario starts with:
+          //  val_raw = fresh reading from sensor wrapper
+          //  err_code is preset to 001 [success)
+          //  ref_tag is preset to 000 (ra)w
+          logic [15:0] val_raw   = sensormeasdata[31:16]; //raw result 16-bit word
+          logic [15:0] val_final;                         //final value we'll return
+          logic [2:0]  err_code  = 3'b001;                //assume valid
+          logic [2:0]  ref_tag   = 3'b000;                //default RAW
+
+          //-----Auto capture logic (only after a successful RAW (mode00))------
+          //---we check if REF1 is empty (like @start-up)---
+          if (mode==2'b00) begin
+            if (!ref1_v[PSELx][SensorIndex]) begin
+              ref1_mem[PSELx][SensorIndex] <= val_raw; //if REF1 is empty we fill corresponding sensor non-volatile memory
+              ref1_v  [PSELx][SensorIndex] <= 1'b1;    //we also set its ref1_v flag (also non-volatile) to 1 to indicate data is valid on mem
+              err_code = 3'b110; // Valid measurement and valid write/overwrite to REF (either REF1 or REF2)
+            end
+            else if (!ref2_v[PSELx][SensorIndex] && por_seen) begin //important to note that never gets triggered @start-up; only when a power reset is done (and REF1 is valid)
+              ref2_mem[PSELx][SensorIndex] <= val_raw;
+              ref2_v  [PSELx][SensorIndex] <= 1'b1;
+              err_code = 3'b110;
+            end
+          end
+
+          // Forced overwrite via ref_cfg bits (ONLY valid when mode==00)
+          // notes:
+          //    - when ref_cfc is 0010, only REF1 is overwritten
+          //    - when ref_cfc is 0100, only REF2 is overwritten
+          //    - when ref_cfc is 0101, btoh REF1 and REF2 are overwritten
+          if (mode==2'b00 && ref_cfg!=4'b0000) begin
+            if (ref_cfg==4'b0010 || ref_cfg==4'b0101) begin //overwrite REF1 alone with 0010
+              ref1_mem[PSELx][SensorIndex] <= val_raw;
+              ref1_v  [PSELx][SensorIndex] <= 1'b1;
+              err_code = 3'b110;
+            end
+            if (ref_cfg==4'b0100 || ref_cfg==4'b0101) begin //overwrite REF2 alone with 0100
+              ref2_mem[PSELx][SensorIndex] <= val_raw;
+              ref2_v  [PSELx][SensorIndex] <= 1'b1;
+              err_code = 3'b110;
+            end            
+          end
+    
+          // Subtraction / REF selection
+          unique case (mode)
+            2'b00: begin           //SLOW raw
+              val_final = val_raw;
+              ref_tag   = 3'b000;
+              last_ref_tag[PSELx][SensorIndex] <= 2'b00;
+            end
+            2'b01: begin           //SLOW raw - REF1
+              if (ref1_v[PSELx][SensorIndex]) begin
+                val_final = val_raw - ref1_mem[PSELx][SensorIndex];
+                ref_tag   = 3'b001; //raw-ref1
+                last_ref_tag[PSELx][SensorIndex] <= 2'b01;
+              end else begin
+                val_final = 16'd0;
+                ref_tag   = 3'b111; //error
+                err_code  = 3'b010;  // REF1 missing
+              end
+            end
+            2'b10: begin           //SLOW raw - REF2
+              if (ref2_v[PSELx][SensorIndex]) begin
+                val_final = val_raw - ref2_mem[PSELx][SensorIndex];
+                ref_tag   = 3'b010; //raw-ef2
+                last_ref_tag[PSELx][SensorIndex] <= 2'b10;
+              end else begin
+                val_final = 16'd0;
+                ref_tag   = 3'b111; //error
+                err_code  = 3'b011;  // REF2 missing
+              end
+            end
+            2'b11: begin  // FAST
+              val_final = val_raw;          // sensor wrapper gave last value stoed in 'recordedvalue'
+              //and here we label the fast mesaurement reusult with the last slow measurement type
+              ref_tag   = (last_ref_tag[PSELx][SensorIndex]==2'b01)?3'b001:
+                           (last_ref_tag[PSELx][SensorIndex]==2'b10)?3'b010:
+                           3'b000;
+            end
+          endcase
+
+          // Pack final result
+          ResultForCPU[31:16] <= val_final;
+          ResultForCPU[15:13] <= err_code;
+          ResultForCPU[12:10] <= ref_tag;
+          ResultForCPU[9:0]   <= 10'd0;      // reserved
+
         end
       endcase
     end

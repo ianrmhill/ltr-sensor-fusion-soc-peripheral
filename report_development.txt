@@ -4,4 +4,9 @@
 - REF1_valid
 - REF2
 - REF2_valid
-- REF_TAG
+- last_ref_tag
+
+//Explain auto-capture capabailty for REF1 and REF2 or manual options
+//note that in auto capture logic; at system start-up when REF1 and REF2 are unvalid,
+only REF1 gets captured and REF2 does not.
+//after there is a power up reset, REF1 would now be valid and REF2 would be populated

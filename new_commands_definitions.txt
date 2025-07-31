@@ -101,6 +101,7 @@ Scenario universe (taking a DC Analog measurement at index=0 as an example)
 * The first time ever I connect this dc analog sensor to the ip block, it's corresponding non-volatile memory for REF1 will be zeroed
 
 ////NOTE: CAN ALSO DO AUTOMATIC CAPTURE since at startup ref1_valid=ref2_valid =0
+// both examples below for @power up or start up are actually invalidated by the implementation of automatic capture 
 
 ------------WORKFLOW @ Start-up [populating REF1 and REF2]--------------
 Notes:
