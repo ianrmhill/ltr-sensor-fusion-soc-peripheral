@@ -3,6 +3,8 @@
 
 //show how CPUCommands and Result were refactored
 
+//apb dynamic bus
+
 //add memory map | volatilty | width | implementation note
 - Last Slow Result
 - REF1
